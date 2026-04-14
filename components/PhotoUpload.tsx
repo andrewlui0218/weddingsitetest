@@ -1,78 +1,93 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+
+declare global {
+  interface Window {
+    cloudinary: any;
+  }
+}
 
 const PhotoUpload: React.FC = () => {
   const { ref, isVisible } = useScrollAnimation();
   const [guestName, setGuestName] = useState('');
-  const [files, setFiles] = useState<FileList | null>(null);
-  const [status, setStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
+  const widgetRef = useRef<any>(null);
 
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbz1RukRIBeurcexnrUH1mPlkTPh2SB1LKnNigkCanpVeN8Hinw6pkocZP-hHd9IYwsq/exec';
-
-  const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
-
-  const uploadPhotos = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!guestName || !files || files.length === 0) {
-      alert("請輸入姓名並選擇照片");
-      return;
-    }
-
-    setStatus('uploading');
-    setStatusMessage("上傳中，請稍候...");
-
-    let successCount = 0;
-    let failCount = 0;
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      try {
-        const base64Data = await toBase64(file);
-        
-        const payload = {
-          guestName: guestName,
-          fileName: file.name,
-          mimeType: file.type,
-          base64Data: base64Data.split(',')[1] // 移除 Base64 header
-        };
-
-        const response = await fetch(scriptURL, {
-          method: 'POST',
-          body: JSON.stringify(payload)
+  useEffect(() => {
+    const initWidget = () => {
+      if (window.cloudinary && !widgetRef.current) {
+        widgetRef.current = window.cloudinary.createUploadWidget({
+          cloudName: "dcnq5labq", 
+          uploadPreset: "Wedding Preset",
+          sources: ["local", "camera"], // 支援手機相簿和直接拍照
+          multiple: true,               // 允許多圖上傳
+          maxFiles: 10,                 // 每次最多上傳 10 張，防止過載
+          clientAllowedFormats: ["jpg", "png", "heic", "jpeg"],
+          
+          // --- 速度優化設定 ---
+          maxImageWidth: 2000,          // 將寬度限制在 2000px 內
+          maxImageHeight: 2000,
+          imageShrink: true,            // 關鍵：在客戶端先壓縮圖片再傳送，速度提升 5x
+          
+          // 介面美化 (配合婚禮色調)
+          styles: {
+            palette: {
+              window: "#FFFFFF",
+              action: "#8e7cc3", // matching wedding-primary
+              tabIcon: "#8e7cc3",
+              textDark: "#444444",
+              textLight: "#FFFFFF",
+              link: "#8e7cc3",
+              inactiveTabIcon: "#999999",
+              error: "#F44235",
+              inProgress: "#8e7cc3",
+              complete: "#20B832",
+              sourceBg: "#F4F4F4"
+            }
+          }
+        }, (error: any, result: any) => { 
+          if (!error && result && result.event === "success") { 
+            setStatusMessage("上傳成功！感謝分享。");
+            
+            // 顯示縮圖預覽
+            const thumbUrl = result.info.secure_url.replace("/upload/", "/upload/c_thumb,w_200,g_face/");
+            setUploadedPhotos(prev => [...prev, thumbUrl]);
+          }
         });
-        
-        const result = await response.json();
-        if (result.status === "success") {
-          successCount++;
-        } else {
-          failCount++;
-        }
-      } catch (error) {
-        console.error(error);
-        failCount++;
+      }
+    };
+
+    // If script is already loaded
+    if (window.cloudinary) {
+      initWidget();
+    } else {
+      // Fallback if script takes time to load
+      const script = document.querySelector('script[src="https://upload-widget.cloudinary.com/global/all.js"]');
+      if (script) {
+        script.addEventListener('load', initWidget);
       }
     }
+  }, []);
 
-    if (failCount === 0) {
-      setStatus('success');
-      setStatusMessage("上傳成功！感謝你的分享。");
-      setGuestName('');
-      setFiles(null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    } else if (successCount > 0) {
-      setStatus('error');
-      setStatusMessage(`部分上傳成功 (${successCount})，部分失敗 (${failCount})。請再試一次。`);
+  const handleOpenWidget = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const name = guestName.trim();
+    
+    if (!name) {
+        alert("請先輸入你的名字，讓我們知道是誰傳的相片 😊");
+        return;
+    }
+
+    if (widgetRef.current) {
+      // 更新 Widget 的 Tags，這樣你在後台就能看到是誰上傳的
+      widgetRef.current.update({ 
+          tags: [name, "wedding_2026"],
+          context: { uploader: name }
+      });
+      widgetRef.current.open();
     } else {
-      setStatus('error');
-      setStatusMessage("上傳失敗，請再試一次。");
+      alert("上傳組件載入中，請稍後再試...");
     }
   };
 
@@ -91,14 +106,14 @@ const PhotoUpload: React.FC = () => {
           <h3 className="font-serif text-4xl md:text-5xl font-bold text-wedding-dark tracking-wider mb-4">
             Share Your Moments
           </h3>
-          <p className="text-gray-600 font-medium">分享你的即拍照片</p>
+          <p className="text-gray-600 font-medium">分享你在婚禮現場捕捉到的精彩瞬間</p>
         </div>
         
         <div className="bg-white rounded-[20px] md:rounded-[40px] shadow-xl overflow-hidden border border-wedding-primary/10 relative ring-4 ring-white/50 p-8 md:p-12">
           {/* Decorative accent top bar */}
           <div className="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-wedding-primary/30 via-wedding-dark/30 to-wedding-primary/30"></div>
           
-          <form onSubmit={uploadPhotos} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6">
             <div>
               <label htmlFor="guestName" className="block text-sm font-semibold text-gray-700 mb-2">請問你的姓名？ (Your Name)</label>
               <input 
@@ -106,66 +121,41 @@ const PhotoUpload: React.FC = () => {
                 id="guestName" 
                 value={guestName}
                 onChange={(e) => setGuestName(e.target.value)}
-                placeholder="輸入姓名..." 
+                placeholder="請輸入你的名字 (例如: Andrew)" 
                 required
-                disabled={status === 'uploading'}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-wedding-primary focus:border-transparent outline-none transition-all disabled:bg-gray-100 disabled:text-gray-500"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-wedding-primary focus:border-transparent outline-none transition-all"
               />
             </div>
 
-            <div>
-              <label htmlFor="fileInput" className="block text-sm font-semibold text-gray-700 mb-2">選擇照片 (Select Photos)</label>
-              <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-wedding-primary transition-colors bg-gray-50">
-                <input 
-                  type="file" 
-                  id="fileInput" 
-                  accept="image/*" 
-                  multiple
-                  ref={fileInputRef}
-                  onChange={(e) => setFiles(e.target.files)}
-                  disabled={status === 'uploading'}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                />
-                <div className="pointer-events-none">
-                  <i className="fa-solid fa-cloud-arrow-up text-3xl text-wedding-primary mb-2"></i>
-                  <p className="text-gray-600">點擊或拖曳照片至此處</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {files && files.length > 0 ? `已選擇 ${files.length} 張照片` : '支援多張上傳'}
-                  </p>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-3 flex items-start gap-1.5 bg-gray-50 p-3 rounded-md border border-gray-100">
-                <i className="fa-solid fa-circle-info mt-0.5 text-wedding-primary"></i>
-                <span>溫馨提示：由於系統處理時間限制，如果一次上傳太多高清照片可能會超時失敗。若遇到此情況，請嘗試分批上傳 5-10 張照片哦！</span>
-              </p>
-            </div>
-
             <button 
-              type="submit" 
-              disabled={status === 'uploading' || !guestName || !files || files.length === 0}
-              className="mt-4 w-full bg-wedding-dark text-white font-semibold py-4 rounded-lg shadow-md hover:bg-wedding-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              onClick={handleOpenWidget}
+              className="mt-2 w-full bg-wedding-dark text-white font-semibold py-4 rounded-lg shadow-md hover:bg-wedding-primary transition-colors flex items-center justify-center gap-2"
             >
-              {status === 'uploading' ? (
-                <>
-                  <i className="fa-solid fa-circle-notch fa-spin"></i> 上傳中...
-                </>
-              ) : (
-                <>
-                  <i className="fa-solid fa-camera"></i> 上傳照片
-                </>
-              )}
+              <i className="fa-solid fa-camera"></i> 選擇並上傳相片
             </button>
 
             {statusMessage && (
-              <div className={`p-4 rounded-lg text-center font-medium ${
-                status === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 
-                status === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 
-                'bg-blue-50 text-blue-700 border border-blue-200'
-              }`}>
+              <div className="p-4 rounded-lg text-center font-medium bg-green-50 text-green-700 border border-green-200">
                 {statusMessage}
               </div>
             )}
-          </form>
+
+            {uploadedPhotos.length > 0 && (
+              <div className="mt-6">
+                <p className="text-sm font-semibold text-gray-700 mb-3 text-center">已上傳的照片：</p>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  {uploadedPhotos.map((url, index) => (
+                    <img 
+                      key={index} 
+                      src={url} 
+                      alt={`Uploaded ${index + 1}`} 
+                      className="w-20 h-20 object-cover rounded-md border border-gray-200 shadow-sm"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
