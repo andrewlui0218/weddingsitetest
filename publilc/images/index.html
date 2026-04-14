@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Christy & Andrew - Wedding RSVP</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-purple: #8e7cc3; 
+            --dark-purple: #5e4b8b;
+            --text-color: #333333;
+            --faded-bg-general: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)), url('wedding-photo.jpg');
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+            text-align: center;
+            background-color: #fcfcfc;
+            overflow-x: hidden;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 { 
+            font-family: 'Great Vibes', 'Edwardian Script ITC', cursive; 
+            font-size: clamp(3.5rem, 15vw, 6.5rem); 
+            color: var(--dark-purple); 
+            line-height: 1.1;
+            font-weight: 400;
+            margin: 0;
+        }
+        
+        h2 { 
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem; 
+            letter-spacing: 2px; 
+            color: #666; 
+            font-weight: 400; 
+            font-style: italic;
+            margin-bottom: 5px;
+            text-transform: none;
+        }
+        
+        h3 { 
+            font-family: 'Cormorant Garamond', serif; 
+            color: var(--dark-purple); 
+            font-size: clamp(2.5rem, 8vw, 3.2rem); 
+            font-weight: 700; 
+            letter-spacing: 2px; 
+            margin-bottom: 25px; 
+        }
+
+        .section-with-bg { 
+            background-image: var(--faded-bg-general); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+        }
+
+        /* --- 1. HERO PAGE (WEBSITE OPTIMIZED) --- */
+        #hero-page {
+            height: 100vh;
+            height: 100svh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            padding-top: 4vh; /* 方框位置保持在高處 */
+
+            background-image: url('wedding-photo.jpg'); 
+            background-size: cover;
+            /* 裁切演算法：中心對齊，但強制保留底部 93.5% 內容，避免切到腿 */
+            background-position: center 93.5%; 
+            background-repeat: no-repeat;
+            background-attachment: scroll; 
+        }
+
+        .hero-overlay {
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            padding: 20px 40px; 
+            border-radius: 35px; 
+            width: 85%; 
+            max-width: 650px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+
+        .invite-text { 
+            font-family: 'Cormorant Garamond', serif;
+            margin-top: 5px;
+            font-size: 1.25rem; 
+            letter-spacing: 1px; 
+            color: #777; 
+            font-style: italic;
+        }
+
+        /* --- 2. DATE & LOCATION --- */
+        #date-timer-page { padding: 100px 20px; }
+        
+        .photo-style-date {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.8rem, 8vw, 4rem);
+            color: var(--dark-purple);
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .photo-style-ballroom {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            letter-spacing: 6px;
+            color: var(--dark-purple);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .photo-style-hotel {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+            letter-spacing: 2px;
+            color: var(--dark-purple);
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            white-space: nowrap; 
+        }
+
+        .schedule-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            max-width: 800px;
+            margin: 40px auto;
+            border-top: 1px solid rgba(142, 124, 195, 0.3);
+            padding-top: 40px;
+        }
+
+        .schedule-item { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .schedule-title { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dark-purple); font-weight: 600; margin-bottom: 10px; }
+        .schedule-icon { font-size: 1.5rem; color: var(--dark-purple); margin-bottom: 10px; opacity: 0.8; }
+        .schedule-time { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--text-color); font-weight: 600; }
+
+        #countdown { display: flex; justify-content: center; gap: 10px; margin-top: 50px; }
+        .countdown-item { border: 1px solid var(--primary-purple); border-radius: 12px; padding: 10px; width: 75px; background: rgba(255, 255, 255, 0.5); }
+        .countdown-number { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--dark-purple); font-weight: 700; display: block; }
+        .countdown-label { font-size: 0.6rem; text-transform: uppercase; color: #777; }
+
+        /* --- STICKY MENU --- */
+        #mini-content-page { padding: 15px 0; background: #fff; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #f0f0f0; }
+        .menu-container { display: flex; justify-content: center; gap: clamp(10px, 4vw, 25px); }
+        .menu-item { text-decoration: none; color: #555; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- 3. OUR STORY --- */
+        .timeline-section { padding: 80px 20px; }
+        .timeline { position: relative; max-width: 900px; margin: 40px auto; }
+        .timeline::after { content: ''; position: absolute; width: 1px; background: var(--primary-purple); top: 0; bottom: 0; left: 50%; transform: translateX(-50%); }
+        .timeline-item { width: 50%; padding: 20px 30px; position: relative; opacity: 0; transform: translateY(30px); transition: 0.8s; }
+        .timeline-item.active { opacity: 1; transform: translateY(0); }
+        .timeline-item::after { content: ''; position: absolute; width: 12px; height: 12px; background: #fff; border: 2px solid var(--primary-purple); border-radius: 50%; top: 26px; z-index: 2; }
+        .left { left: 0; text-align: right; }
+        .right { left: 50%; text-align: left; }
+        .left::after { right: -6px; } .right::after { left: -6px; }
+        .timeline-content { padding: 15px; background: rgba(255,255,255,0.6); border-radius: 20px; }
+        .timeline-content img { width: 100%; border-radius: 12px; margin-bottom: 10px; }
+        .timeline-date { font-family: 'Cormorant Garamond', serif; color: var(--dark-purple); font-weight: 700; font-size: 1.2rem; display: block; }
+        .timeline-title { font-weight: 600; font-size: 0.9rem; color: #444; }
+
+        /* --- 4. PRE-WEDDING --- */
+        .tab-container { margin-bottom: 30px; display: flex; justify-content: center; gap: 15px; }
+        .tab-button { 
+            padding: 10px 25px; border: 1.5px solid var(--dark-purple); background: #fff; color: var(--dark-purple);
+            cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; border-radius: 50px; transition: 0.3s;
+        }
+        .tab-button.active { background: var(--dark-purple); color: #fff; }
+        
+        .tab-content { display: none; max-width: 1100px; margin: 0 auto; padding: 0 15px; }
+        .tab-content.active { display: block; }
+
+        .gallery-waterfall { column-count: 3; column-gap: 15px; }
+        .gallery-item { break-inside: avoid; margin-bottom: 15px; }
+        .gallery-item img { width: 100%; height: auto; display: block; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+
+        /* --- 5. TRANSPORTATION --- */
+        .maps-container { display: flex; gap: 20px; max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .map-box { flex: 1; border-radius: 12px; overflow: hidden; border: 1px solid #ddd; background: #fff; }
+        .map-box img { width: 100%; height: auto; display: block; }
+
+        /* --- 6. RSVP --- */
+        .google-form-wrapper {
+            max-width: 750px; margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.85); 
+            border-radius: 30px; overflow: hidden; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06); 
+            width: 95%; padding: 10px;
+        }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            #hero-page { 
+                padding-top: 4vh; 
+                background-position: center top; /* 手機版通常較窄，優先顯示頂部 */
+            } 
+            .hero-overlay { padding: 15px 20px; width: 88%; }
+            
+            #hero-page h1 { font-size: 3.8rem; }
+            h2 { font-size: 1rem; } 
+            .invite-text { font-size: 1rem; }
+
+            .photo-style-hotel { font-size: 1.1rem; letter-spacing: 1px; }
+
+            .timeline::after { left: 20px; }
+            .timeline-item { width: 100%; padding-left: 45px; text-align: left; }
+            .left::after, .right::after { left: 14px; }
+            .right, .left { left: 0; }
+            .gallery-waterfall { column-count: 2; }
+            .maps-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <section id="hero-page">
+        <div class="hero-overlay">
+            <h2>Together with their families</h2>
+            <h1>Christy & Andrew</h1>
+            <p class="invite-text">invite you to celebrate their marriage</p>
+        </div>
+    </section>
+
+    <section id="date-timer-page" class="section-with-bg">
+        <div class="photo-style-date">25th April, 2026</div>
+        <div class="photo-style-ballroom">Grand Ballroom</div>
+        <div class="photo-style-hotel">WM Hotel, Sai Kung</div>
+
+        <div class="schedule-container">
+            <div class="schedule-item">
+                <span class="schedule-title">Reception</span>
+                <i class="fa-solid fa-door-open schedule-icon"></i>
+                <span class="schedule-time">6:00 PM</span>
+            </div>
+            <div class="schedule-item">
+                <span class="schedule-title">Ceremony</span>
+                <i class="fa-solid fa-ring schedule-icon"></i>
+                <span class="schedule-time">6:30 PM</span>
+            </div>
+            <div class="schedule-item">
+                <span class="schedule-title">Banquet</span>
+                <i class="fa-solid fa-utensils schedule-icon"></i>
+                <span class="schedule-time">8:00 PM</span>
+            </div>
+        </div>
+
+        <div id="countdown">
+            <div class="countdown-item"><span class="countdown-number" id="days">00</span><span class="countdown-label">Days</span></div>
+            <div class="countdown-item"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Hours</span></div>
+            <div class="countdown-item"><span class="countdown-number" id="minutes">00</span><span class="countdown-label">Mins</span></div>
+            <div class="countdown-item"><span class="countdown-number" id="seconds">00</span><span class="countdown-label">Secs</span></div>
+        </div>
+    </section>
+
+    <section id="mini-content-page">
+        <div class="menu-container">
+            <a href="#hero-page" class="menu-item">Home</a>
+            <a href="#our-story" class="menu-item">Story</a>
+            <a href="#pre-wedding" class="menu-item">Photos</a>
+            <a href="#transportation" class="menu-item">Map</a>
+            <a href="#rsvp-section" class="menu-item" style="color:var(--dark-purple)">RSVP</a>
+        </div>
+    </section>
+
+    <section id="our-story" class="timeline-section section-with-bg">
+        <h3>Our Story</h3>
+        <div class="timeline">
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <img src="story1.jpg" onerror="this.style.display='none'">
+                    <span class="timeline-date">12th May, 2021</span>
+                    <div class="timeline-title">Our first Date!</div>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <img src="story2.jpg" onerror="this.style.display='none'">
+                    <span class="timeline-date">25th December, 2021</span>
+                    <div class="timeline-title">Our first Christmas!</div>
+                </div>
+            </div>
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <img src="story3.jpg" onerror="this.style.display='none'">
+                    <span class="timeline-date">12th October, 2024</span>
+                    <div class="timeline-title">Tottori, Japan</div>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <img src="story4.jpg" onerror="this.style.display='none'">
+                    <span class="timeline-date">23rd October, 2024</span>
+                    <div class="timeline-title">Happy Graduation!</div>
+                </div>
+            </div>
+            <div class="timeline-item left">
+                <div class="timeline-content">
+                    <img src="story5.JPG" onerror="this.style.display='none'">
+                    <span class="timeline-date">15th November, 2024</span>
+                    <div class="timeline-title">We are engaged!</div>
+                </div>
+            </div>
+            <div class="timeline-item right">
+                <div class="timeline-content">
+                    <img src="story6.jpg" onerror="this.style.display='none'">
+                    <span class="timeline-date">25th April, 2026</span>
+                    <div class="timeline-title">Our Big Day!</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pre-wedding" class="section-with-bg" style="padding:80px 0;">
+        <h3>Pre-Wedding</h3>
+        <div class="tab-container">
+            <button class="tab-button active" onclick="switchTab(event, 'hk')">Hong Kong</button>
+            <button class="tab-button" onclick="switchTab(event, 'hokkaido')">Hokkaido</button>
+        </div>
+
+        <div id="hk" class="tab-content active">
+            <div class="gallery-waterfall">
+                <div class="gallery-item"><img src="hk1.jpg"></div>
+                <div class="gallery-item"><img src="hk2.jpg"></div>
+                <div class="gallery-item"><img src="hk3.jpg"></div>
+                <div class="gallery-item"><img src="hk4.jpg"></div>
+                <div class="gallery-item"><img src="hk5.jpg"></div>
+                <div class="gallery-item"><img src="hk6.jpg"></div>
+            </div>
+        </div>
+
+        <div id="hokkaido" class="tab-content">
+            <div class="gallery-waterfall">
+                <div class="gallery-item"><img src="jp1.jpg"></div>
+                <div class="gallery-item"><img src="jp2.jpg"></div>
+                <div class="gallery-item"><img src="jp3.jpg"></div>
+                <div class="gallery-item"><img src="jp4.jpg"></div>
+                <div class="gallery-item"><img src="jp5.jpg"></div>
+                <div class="gallery-item"><img src="jp6.jpg"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="transportation" class="section-with-bg" style="padding:80px 0;">
+        <h3>Transportation</h3>
+        <div class="maps-container">
+            <div class="map-box"><img src="direction-map.jpg"></div>
+            <div class="map-box"><img src="transport-guide.jpg"></div>
+        </div>
+    </section>
+
+    <section id="rsvp-section" class="section-with-bg" style="padding:80px 0;">
+        <h3>RSVP</h3>
+        <div class="google-form-wrapper">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfaH24owLvRyQwfxxAPKVw_gSAdb72lLFm3TTF1JN0Gi2XzOA/viewform?embedded=true" 
+                    width="100%" 
+                    height="1000" 
+                    frameborder="0" 
+                    marginheight="0" 
+                    marginwidth="0">載入中…</iframe>
+        </div>
+    </section>
+
+    <footer style="padding:40px; background:#222; color:#666; font-size:0.7rem; letter-spacing:1px;">
+        CHRISTY & ANDREW | 2026
+    </footer>
+
+    <script>
+        function switchTab(evt, tabName) {
+            const contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
+            const buttons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.timeline-item').forEach(item => observer.observe(item));
+
+        const weddingDate = new Date("April 25, 2026 18:00:00").getTime();
+        setInterval(function() {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+            if (distance < 0) return;
+            document.getElementById("days").innerText = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
+            document.getElementById("hours").innerText = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+            document.getElementById("minutes").innerText = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+            document.getElementById("seconds").innerText = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>
